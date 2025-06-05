@@ -5,119 +5,127 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Caballo de Ajedrez</title>
     <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            margin: 20px; 
-            padding-top: 30px;
-            text-align: center; /* Centra el contenido del body */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 50px;
         }
-        h1 {
-            margin-bottom: 30px;
+        .container {
+            text-align: center;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        .controls div {
-            display: inline-block; /* Mantiene los inputs en línea */
-            margin: 0 5px; /* Espacio entre los elementos de control */
+        .input-group {
+            margin-bottom: 20px;
         }
-        label {
-            margin-right: 5px;
+        .input-group label {
+            margin-right: 10px;
         }
-        input[type="number"] { 
-            width: 40px; /* Ancho reducido para los números */
+        .input-group input[type="number"] {
+            width: 50px;
             padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            text-align: center;
         }
-        button { 
-            padding: 6px 12px; 
-            margin-left: 10px;
-            cursor: pointer; 
+        button {
+            padding: 8px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
         }
-        #resultsArea { 
-            margin-top: 25px; 
-            white-space: pre-wrap; /* Respeta los saltos de línea (\n) en el texto */
-            font-family: monospace; /* Fuente monoespaciada para mejor alineación de números */
-            font-size: 1em; /* Tamaño de fuente para los resultados */
-            line-height: 1.6; /* Espaciado entre líneas */
-            /* Si quieres que el bloque de texto esté centrado pero el texto dentro alineado a la izquierda:
-            display: inline-block; 
-            text-align: left; 
-            */
+        button:hover {
+            background-color: #0056b3;
         }
-        .error { 
-            color: red; 
-            font-weight: bold; 
+        #resultado {
+            margin-top: 20px;
+            white-space: pre-wrap; /* Para mantener los saltos de línea */
+        }
+        .error {
+            color: red;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
     <h1>Caballo de Ajedrez</h1>
 
-    <div class="controls">
-        <div>
-            <label for="rowInput">Fila:</label>
-            <input type="number" id="rowInput" min="1" max="8" value="1">
+    <div class="container">
+        <div class="input-group">
+            <label for="fila">Fila:</label>
+            <input type="number" id="fila" value="1" min="1" max="8">
+            <label for="columna">Columna:</label>
+            <input type="number" id="columna" value="1" min="1" max="8">
+            <button onclick="calcularMovimientos()">Calcular Movimientos</button>
         </div>
-        <div>
-            <label for="colInput">Columna:</label>
-            <input type="number" id="colInput" min="1" max="8" value="1">
+
+        <div id="resultado">
+            <p>El caballo puede saltar de 1 1 a:</p>
+            <p>2 3</p>
+            <p>3 2</p>
         </div>
-        <button id="calculateButton">Calcular Movimientos</button>
     </div>
 
-    <div id="resultsArea">
-        </div>
+    <script>
+        function calcularMovimientos() {
+            const filaInput = document.getElementById('fila');
+            const columnaInput = document.getElementById('columna');
+            const resultadoDiv = document.getElementById('resultado');
 
-    <script src="script.js"></script>
+            const fila = parseInt(filaInput.value);
+            const columna = parseInt(columnaInput.value);
+
+            // Limpiar resultados anteriores y mensajes de error
+            resultadoDiv.innerHTML = '';
+
+            // Validar las coordenadas ingresadas
+            if (isNaN(fila) || isNaN(columna) || fila < 1 || fila > 8 || columna < 1 || columna > 8) {
+                resultadoDiv.innerHTML = '<p class="error">Coordenada ingresada inválida. Por favor, ingrese un número entre 1 y 8 para la fila y la columna.</p>';
+                return;
+            }
+
+            // Posibles movimientos del caballo (dr, dc):
+            // (delta_fila, delta_columna)
+            const movimientosPosibles = [
+                [-2, -1], [-2, 1],
+                [-1, -2], [-1, 2],
+                [1, -2], [1, 2],
+                [2, -1], [2, 1]
+            ];
+
+            const movimientosValidos = [];
+
+            movimientosPosibles.forEach(movimiento => {
+                const nuevaFila = fila + movimiento[0];
+                const nuevaColumna = columna + movimiento[1];
+
+                // Verificar si el nuevo movimiento está dentro del tablero (1 a 8)
+                if (nuevaFila >= 1 && nuevaFila <= 8 && nuevaColumna >= 1 && nuevaColumna <= 8) {
+                    movimientosValidos.push(`${nuevaFila} ${nuevaColumna}`);
+                }
+            });
+
+            if (movimientosValidos.length > 0) {
+                resultadoDiv.innerHTML = `<p>El caballo puede saltar de ${fila} ${columna} a:</p>`;
+                movimientosValidos.forEach(mov => {
+                    resultadoDiv.innerHTML += `<p>${mov}</p>`;
+                });
+            } else {
+                resultadoDiv.innerHTML = `<p>El caballo en ${fila} ${columna} no tiene movimientos válidos dentro del tablero.</p>`;
+            }
+        }
+
+        // Simular el estado inicial de la imagen
+        window.onload = function() {
+            document.getElementById('fila').value = 1;
+            document.getElementById('columna').value = 1;
+            calcularMovimientos(); // Calcular los movimientos iniciales para que coincida con la imagen
+        };
+    </script>
 </body>
 </html>
-
-document.addEventListener('DOMContentLoaded', () => {
-    const rowInput = document.getElementById('rowInput');
-    const colInput = document.getElementById('colInput');
-    const calculateButton = document.getElementById('calculateButton');
-    const resultsArea = document.getElementById('resultsArea');
-
-    calculateButton.addEventListener('click', () => {
-        resultsArea.textContent = ''; // Limpiar resultados previos
-        resultsArea.classList.remove('error'); // Limpiar clase de error si existía
-
-        const row = parseInt(rowInput.value);
-        const col = parseInt(colInput.value);
-
-        // 1. Validar entrada del usuario
-        if (isNaN(row) || isNaN(col) || row < 1 || row > 8 || col < 1 || col > 8) {
-            resultsArea.textContent = 'Error: Las coordenadas deben ser números entre 1 y 8.';
-            resultsArea.classList.add('error'); // Aplicar estilo de error
-            return;
-        }
-
-        // 2. Definir los 8 posibles movimientos del caballo (delta fila, delta columna)
-        const knightMoves = [
-            [2, 1], [2, -1], [-2, 1], [-2, -1],
-            [1, 2], [1, -2], [-1, 2], [-1, -2]
-        ];
-
-        const possibleMoves = [];
-
-        // 3. Calcular y validar cada movimiento potencial
-        knightMoves.forEach(move => {
-            const newRow = row + move[0];
-            const newCol = col + move[1];
-
-            // Asegurar que las nuevas coordenadas estén dentro del tablero (1-8)
-            if (newRow >= 1 && newRow <= 8 && newCol >= 1 && newCol <= 8) {
-                possibleMoves.push([newRow, newCol]);
-            }
-        });
-
-        // 4. Presentar los resultados según el formato de la imagen
-        if (possibleMoves.length === 0) {
-            // Este caso es improbable en un tablero 8x8 si la entrada es válida.
-            resultsArea.textContent = `El caballo en ${row} ${col} no tiene movimientos posibles.`;
-        } else {
-            let resultsText = `El caballo puede saltar de ${row} ${col} a:\n`; // Línea de título
-            possibleMoves.forEach(move => {
-                resultsText += `${move[0]} ${move[1]}\n`; // Cada movimiento en una nueva línea
-            });
-            resultsArea.textContent = resultsText.trim(); // Usar textContent y trim para quitar último \n
-        }
-    });
-});
